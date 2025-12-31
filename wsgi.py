@@ -9,5 +9,5 @@ sys.path.append(os.path.join(BASE_DIR, 'ml-backend'))
 from app import app
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 5001))
+    port = int(os.getenv("PORT", 10000))
     app.run(host="0.0.0.0", port=port)

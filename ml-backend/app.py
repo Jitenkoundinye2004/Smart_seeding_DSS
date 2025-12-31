@@ -752,9 +752,6 @@ def options():
     return '', 204
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5001))
-    print("\n🚀 Starting Flask ML Backend Server...")
-    print(f"📁 Base Directory: {BASE_DIR}")
-    print(f"🌐 CORS enabled for: http://localhost:5173")
-    print(f"🔗 Server running at: http://localhost:{port}\n")
-    app.run(debug=True, port=port, host='0.0.0.0')
+    port = int(os.getenv('PORT', 10000))
+    logger.info(f"🚀 Starting Flask ML Backend Server on port {port}...")
+    app.run(debug=False, port=port, host='0.0.0.0')
