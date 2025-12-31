@@ -49,11 +49,21 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-app.secret_key = os.getenv('SECRET_KEY')
+app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key_for_development')
 CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['MONGO_URI'] = os.getenv('MONGO_URI')
+app.config['MONGO_URI'] = os.getenv('MONGO_URI', "mongodb://localhost:27017/agricare")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-mongo = PyMongo(app)
+
+# Initialize PyMongo only if MONGO_URI is set
+mongo = None
+if app.config['MONGO_URI']:
+    try:
+        mongo = PyMongo(app)
+        print("✅ MongoDB initialized.")
+    except Exception as e:
+        print(f"❌ ERROR: Could not initialize MongoDB: {e}")
+else:
+    print("⚠️ WARNING: MONGO_URI is not set. Database features will be unavailable.")
 
 # Initialize Google Cloud TTS client if available
 if TTS_AVAILABLE:
@@ -222,7 +232,7 @@ def calculate_traditional_seed_quantity(crop_variety):
 @app.route('/')
 def index():
     user = None
-    if 'user_email' in session:
+    if 'user_email' in session and mongo:
         user = mongo.db.users.find_one({"email": session['user_email']})
     return render_template('index.html', user=user)
 
@@ -234,7 +244,7 @@ def register():
     fullname = request.form.get('fullname')
     email = request.form.get('email')
     password = request.form.get('password')
-    if mongo.db.users.find_one({"email": email}):
+    if mongo and mongo.db.users.find_one({"email": email}):
         return jsonify({"message": "User already exists"}), 409
     photo_path = None
     if photo and allowed_file(photo.filename):
@@ -243,17 +253,18 @@ def register():
             os.makedirs(app.config['UPLOAD_FOLDER'])
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         photo_path = filename
-    mongo.db.users.insert_one({
-        "fullname": fullname, "email": email,
-        "password": generate_password_hash(password), "profile_photo_path": photo_path
-    })
+    if mongo:
+        mongo.db.users.insert_one({
+            "fullname": fullname, "email": email,
+            "password": generate_password_hash(password), "profile_photo_path": photo_path
+        })
     session['user_email'] = email
     return jsonify({"message": "User registered successfully!"}), 201
 
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = mongo.db.users.find_one({"email": data.get('email')})
+    user = mongo.db.users.find_one({"email": data.get('email')}) if mongo else None
     if user and check_password_hash(user['password'], data.get('password')):
         session['user_email'] = user['email']
         return jsonify({"message": "Login successful!", "user": {"fullname": user['fullname']}}), 200
@@ -268,7 +279,7 @@ def logout():
 def prediction_page():
     if 'user_email' not in session:
         return redirect(url_for('login'))
-    user = mongo.db.users.find_one({"email": session['user_email']})
+    user = mongo.db.users.find_one({"email": session['user_email']}) if mongo else None
     return render_template('prediction.html', user=user, unique_values=unique_values,
                            talukaData=taluka_data, prediction_made=False)
 
