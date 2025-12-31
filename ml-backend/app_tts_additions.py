@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from flask import Flask, request, jsonify, render_template, url_for, session, redirect, send_from_directory
 import requests
 from datetime import datetime
@@ -34,9 +38,9 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-app.secret_key = 'your_super_secret_key_for_sessions'
+app.secret_key = os.getenv('SECRET_KEY')
 CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['MONGO_URI'] = "mongodb://localhost:27017/agricare"
+app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 mongo = PyMongo(app)
 

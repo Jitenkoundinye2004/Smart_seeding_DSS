@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from flask import Flask, request, jsonify, render_template, url_for, session, redirect, send_from_directory
 import requests
 from datetime import datetime
@@ -45,9 +49,9 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-app.secret_key = 'your_super_secret_key_for_sessions'
+app.secret_key = os.getenv('SECRET_KEY')
 CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['MONGO_URI'] = "mongodb://localhost:27017/agricare"
+app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 mongo = PyMongo(app)
 
@@ -722,8 +726,9 @@ def options():
     return '', 204
 
 if __name__ == '__main__':
+    port = int(os.getenv('PORT', 5001))
     print("\n🚀 Starting Flask ML Backend Server...")
     print(f"📁 Base Directory: {BASE_DIR}")
     print(f"🌐 CORS enabled for: http://localhost:5173")
-    print(f"🔗 Server running at: http://localhost:5001\n")
-    app.run(debug=True, port=5001, host='0.0.0.0')
+    print(f"🔗 Server running at: http://localhost:{port}\n")
+    app.run(debug=True, port=port, host='0.0.0.0')
