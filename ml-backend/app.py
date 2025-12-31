@@ -1,5 +1,10 @@
 import os
+import logging
 from dotenv import load_dotenv
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -49,21 +54,21 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key_for_development')
+app.secret_key = os.getenv('SECRET_KEY', 'default-dev-key')
 CORS(app, resources={r"/*": {"origins": "*"}})
-app.config['MONGO_URI'] = os.getenv('MONGO_URI', "mongodb://localhost:27017/agricare")
+app.config['MONGO_URI'] = os.getenv('MONGO_URI')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Initialize PyMongo only if MONGO_URI is set
 mongo = None
-if app.config['MONGO_URI']:
+if app.config.get('MONGO_URI'):
     try:
         mongo = PyMongo(app)
-        print("✅ MongoDB initialized.")
+        logger.info("✅ MongoDB initialization attempted.")
     except Exception as e:
-        print(f"❌ ERROR: Could not initialize MongoDB: {e}")
+        logger.error(f"❌ ERROR: Could not initialize MongoDB: {e}")
 else:
-    print("⚠️ WARNING: MONGO_URI is not set. Database features will be unavailable.")
+    logger.warning("⚠️ WARNING: MONGO_URI is not set. Database features will be unavailable.")
 
 # Initialize Google Cloud TTS client if available
 if TTS_AVAILABLE:
@@ -234,8 +239,17 @@ def index():
     return jsonify({
         "status": "online",
         "message": "Agricare ML Backend API is running",
-        "version": "1.0.0"
+        "environment": "production" if os.getenv('RENDER') else "development"
     }), 200
+
+# Global Error Handler
+@app.errorhandler(Exception)
+def handle_exception(e):
+    logger.error(f"Unhandled Exception: {e}", exc_info=True)
+    return jsonify({
+        "error": "Internal Server Error",
+        "message": str(e)
+    }), 500
 
 @app.route('/register', methods=['POST'])
 def register():
