@@ -27,7 +27,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const API_URL = "https://agricare-backend.onrender.com/api/auth";
+    const API_URL = "https://smart-seeding-dss-backend.onrender.com/api/auth";
 
     if (!isLogin) {
       // Sign-up validation
