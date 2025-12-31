@@ -415,6 +415,7 @@ def uploaded_file(filename):
 # --- Health Check ---
 @app.route('/health', methods=['GET'])
 def health_check():
+    import sklearn
     models_status = {
         'classification_model': classification_model is not None,
         'regression_model': regression_model is not None,
@@ -422,6 +423,7 @@ def health_check():
     }
     return jsonify({
         'status': 'running',
+        'sklearn_version': sklearn.__version__,
         'models_loaded': all(models_status.values()),
         'models': models_status
     }), 200
