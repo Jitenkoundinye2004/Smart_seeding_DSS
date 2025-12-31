@@ -231,10 +231,11 @@ def calculate_traditional_seed_quantity(crop_variety):
 
 @app.route('/')
 def index():
-    user = None
-    if 'user_email' in session and mongo:
-        user = mongo.db.users.find_one({"email": session['user_email']})
-    return render_template('index.html', user=user)
+    return jsonify({
+        "status": "online",
+        "message": "Agricare ML Backend API is running",
+        "version": "1.0.0"
+    }), 200
 
 @app.route('/register', methods=['POST'])
 def register():
