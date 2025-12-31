@@ -27,7 +27,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const API_URL = "http://localhost:5000/api/auth";
+    const API_URL = "https://agricare-backend.onrender.com/api/auth";
 
     if (!isLogin) {
       // Sign-up validation
@@ -43,7 +43,7 @@ const Login = () => {
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Something went wrong');
-        
+
         toast.success(data.message);
         setIsLogin(true); // Flip to login form after successful signup
       } catch (error: any) {
@@ -96,9 +96,8 @@ const Login = () => {
           {/* Image Section */}
           <div className="hidden lg:block [perspective:1000px]">
             <div
-              className={`relative w-full h-full rounded-2xl shadow-elegant transition-transform duration-700 [transform-style:preserve-3d] ${
-                !isLogin ? "[transform:rotateY(180deg)]" : ""
-              }`}
+              className={`relative w-full h-full rounded-2xl shadow-elegant transition-transform duration-700 [transform-style:preserve-3d] ${!isLogin ? "[transform:rotateY(180deg)]" : ""
+                }`}
             >
               {/* Front side of the card */}
               <img src={loginImage} alt={t("loginDescription")} className="w-full h-full object-cover rounded-2xl [backface-visibility:hidden]" />
@@ -113,9 +112,8 @@ const Login = () => {
           {/* Form Section */}
           <div className="[perspective:1000px]">
             <div
-              className={`relative transition-transform duration-700 [transform-style:preserve-3d] ${
-                !isLogin ? "[transform:rotateY(180deg)]" : ""
-              }`}
+              className={`relative transition-transform duration-700 [transform-style:preserve-3d] ${!isLogin ? "[transform:rotateY(180deg)]" : ""
+                }`}
             >
               {/* Login Form (Front Face) */}
               <div className="bg-card rounded-2xl shadow-elegant p-8 lg:p-12 border border-border [backface-visibility:hidden]">

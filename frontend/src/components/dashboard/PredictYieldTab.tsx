@@ -100,7 +100,7 @@ const PredictYieldTab = () => {
     // Load dropdown data on mount
     const fetchDropdowns = () => {
         setFetchError(null);
-        fetch("http://localhost:5001/dropdowns")
+        fetch("https://smart-seeding-dss-ml-model.onrender.com/dropdowns")
             .then((res) => {
                 if (!res.ok) throw new Error("Failed to fetch dropdown data");
                 return res.json();
@@ -339,7 +339,7 @@ const PredictYieldTab = () => {
             formDataToSend.append('image', file);
             formDataToSend.append('selected_crop', selectedCrop);
 
-            const res = await fetch('http://localhost:5001/verify_crop_image', {
+            const res = await fetch('https://smart-seeding-dss-ml-model.onrender.com/verify_crop_image', {
                 method: 'POST',
                 body: formDataToSend,
             });
@@ -379,7 +379,7 @@ const PredictYieldTab = () => {
             Farm_Area_hectares: (parseFloat(formData.Farm_Area_Acres) || 1.0) * 0.404686,
         };
         try {
-            const res = await fetch("http://localhost:5001/predict", {
+            const res = await fetch("https://smart-seeding-dss-ml-model.onrender.com/predict", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),

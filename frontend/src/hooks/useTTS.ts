@@ -7,7 +7,7 @@ interface UseTTSResult {
     supported: boolean;
 }
 
-const TTS_API_URL = 'http://localhost:5001/api/tts';
+const TTS_API_URL = 'https://smart-seeding-dss-ml-model.onrender.com/api/tts';
 
 export const useTTS = (language: 'en' | 'hi' | 'mr'): UseTTSResult => {
     const [isSpeaking, setIsSpeaking] = useState(false);
